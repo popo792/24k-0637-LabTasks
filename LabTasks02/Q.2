@@ -1,1 +1,113 @@
+#include <iostream>
+using namespace std;
+
+class DynamicMatrix {
+    int** matrix;
+    int rows, cols;
+
+    void allocate(int r, int c) {
+        rows = r;
+        cols = c;
+        matrix = new int*[rows];
+        for (int i = 0; i < rows; i++) {
+            matrix[i] = new int[cols];
+        }
+    }
+
+    void deallocate() {
+        for (int i = 0; i < rows; i++) {
+            delete[] matrix[i];
+        }
+        delete[] matrix;
+    }
+
+public:
+    DynamicMatrix(int r, int c, int val = 0) {
+        allocate(r, c);
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                matrix[i][j] = val;
+            }
+        }
+    }
+
+    void resize(int newRows, int newCols, int val = 0) {
+        int** newMatrix = new int*[newRows];
+        for (int i = 0; i < newRows; i++) {
+            newMatrix[i] = new int[newCols];
+        }
+
+        for (int i = 0; i < newRows; i++) {
+            for (int j = 0; j < newCols; j++) {
+                if (i < rows && j < cols) {
+                    newMatrix[i][j] = matrix[i][j];
+                } else {
+                    newMatrix[i][j] = val;
+                }
+            }
+        }
+        deallocate();
+
+        matrix = newMatrix;
+        rows = newRows;
+        cols = newCols;
+    }
+
+    void transpose() {
+        int** newMatrix = new int*[cols];
+        for (int i = 0; i < cols; i++) {
+            newMatrix[i] = new int[rows];
+        }
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                newMatrix[j][i] = matrix[i][j];
+            }
+        }
+        deallocate();
+
+        matrix = newMatrix;
+        int temp = rows;
+        rows = cols;
+        cols = temp;
+    }
+
+    void print(bool modifyOdd = false) const {
+        cout << "Matrix:" << endl;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                int value = matrix[i][j];
+                if (modifyOdd && (i + j) % 2 == 1) {
+                    value += 2;
+                }
+                cout << value << " ";
+            }
+            cout << endl;
+        }
+    }
+
+    ~DynamicMatrix() {
+        deallocate();
+    }
+};
+
+int main() {
+    DynamicMatrix m(5, 4, 2);
+
+    cout << "Initial Matrix:" << endl;
+    m.print();
+
+    cout << "\nResized to 4x5 (fill with 9):" << endl;
+    m.resize(4, 5, 9);
+    m.print();
+
+    cout << "\nTransposed Matrix:" << endl;
+    m.transpose();
+    m.print();
+
+    cout << "\nMatrix with +2 added at odd indices:" << endl;
+    m.print(true);
+
+    return 0;
+}
 
