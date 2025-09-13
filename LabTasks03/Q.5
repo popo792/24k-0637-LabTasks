@@ -1,0 +1,90 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct CNode {
+    string song;
+    CNode* next;
+    CNode(const string& s) : song(s), next(nullptr) {}
+};
+
+class Playlist {
+public:
+    CNode* tail;
+    Playlist() : tail(nullptr) {}
+
+    void add_song(const string& s) {
+        CNode* n = new CNode(s);
+        if (!tail) {
+            n->next = n;
+            tail = n;
+        } else {
+            n->next = tail->next;
+            tail->next = n;
+            tail = n;
+        }
+    }
+
+    bool remove_song(const string& s) {
+        if (!tail) return false;
+        CNode* cur = tail->next;
+        CNode* prev = tail;
+        do {
+            if (cur->song == s) {
+                if (cur == prev) {
+                    delete cur;
+                    tail = nullptr;
+                    return true;
+                }
+                prev->next = cur->next;
+                if (cur == tail) tail = prev;
+                delete cur;
+                return true;
+            }
+            prev = cur;
+            cur = cur->next;
+        } while (cur != tail->next);
+        return false;
+    }
+
+    void display() {
+        if (!tail) {
+            cout << "Empty playlist\n";
+            return;
+        }
+        CNode* t = tail->next;
+        do {
+            cout << t->song;
+            t = t->next;
+            if (t != tail->next) cout << " -> ";
+        } while (t != tail->next);
+        cout << "\n";
+    }
+
+    ~Playlist() {
+        if (!tail) return;
+        CNode* start = tail->next;
+        CNode* cur = start->next;
+        while (cur != start) {
+            CNode* tmp = cur;
+            cur = cur->next;
+            delete tmp;
+        }
+        delete start;
+    }
+};
+
+int main() {
+    Playlist p;
+    p.add_song("Song A");
+    p.add_song("Song B");
+    p.add_song("Song C");
+    cout << "Playlist: "; p.display();
+
+    p.remove_song("Song B");
+    cout << "After removing Song B: "; p.display();
+
+    p.add_song("Song D");
+    cout << "After adding Song D: "; p.display();
+    return 0;
+}
