@@ -1,0 +1,82 @@
+#include <iostream>
+using namespace std;
+
+struct DNode {
+    int data;
+    DNode* prev;
+    DNode* next;
+    DNode(int v) : data(v), prev(nullptr), next(nullptr) {}
+};
+
+class Train {
+public:
+    DNode* head;
+    DNode* tail;
+
+    Train() : head(nullptr), tail(nullptr) {}
+
+    void add_end(int v) {
+        DNode* n = new DNode(v);
+        if (!tail) {
+            head = tail = n;
+        } else {
+            tail->next = n;
+            n->prev = tail;
+            tail = n;
+        }
+    }
+
+    bool remove_front() {
+        if (!head) return false;
+        DNode* t = head;
+        head = head->next;
+        if (head) head->prev = nullptr;
+        else tail = nullptr;
+        delete t;
+        return true;
+    }
+
+    bool search(int v) {
+        DNode* t = head;
+        while (t) {
+            if (t->data == v) return true;
+            t = t->next;
+        }
+        return false;
+    }
+
+    void display() {
+        DNode* t = head;
+        while (t) {
+            cout << t->data;
+            if (t->next) cout << " <-> ";
+            t = t->next;
+        }
+        cout << "\n";
+    }
+
+    ~Train() {
+        while (head) {
+            DNode* t = head;
+            head = head->next;
+            delete t;
+        }
+    }
+};
+
+int main() {
+    Train t;
+    t.add_end(101);
+    t.add_end(102);
+    t.add_end(103);
+
+    cout << "Initial: ";
+    t.display();
+
+    t.remove_front();
+    cout << "After removing front: ";
+    t.display();
+
+    cout << boolalpha << "Search 103: " << t.search(103) << "\n";
+    return 0;
+}
