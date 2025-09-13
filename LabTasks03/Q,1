@@ -1,0 +1,90 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct Node {
+    string data;
+    Node* next;
+    Node(const string& s) : data(s), next(nullptr) {}
+};
+
+class SinglyList {
+public:
+    Node* head;
+    SinglyList() : head(nullptr) {}
+
+    void push_front(const string& s) {
+        Node* n = new Node(s);
+        n->next = head;
+        head = n;
+    }
+
+    void push_back(const string& s) {
+        Node* n = new Node(s);
+        if (!head) {
+            head = n;
+            return;
+        }
+        Node* t = head;
+        while (t->next) t = t->next;
+        t->next = n;
+    }
+
+    bool insert_after(const string& after, const string& s) {
+        Node* t = head;
+        while (t) {
+            if (t->data == after) {
+                Node* n = new Node(s);
+                n->next = t->next;
+                t->next = n;
+                return true;
+            }
+            t = t->next;
+        }
+        return false;
+    }
+
+    bool search(const string& s) {
+        Node* t = head;
+        while (t) {
+            if (t->data == s) return true;
+            t = t->next;
+        }
+        return false;
+    }
+
+    void display() {
+        Node* t = head;
+        while (t) {
+            cout << t->data;
+            if (t->next) cout << " -> ";
+            t = t->next;
+        }
+        cout << "\n";
+    }
+
+    ~SinglyList() {
+        while (head) {
+            Node* t = head;
+            head = head->next;
+            delete t;
+        }
+    }
+};
+
+int main() {
+    SinglyList list;
+    list.push_back("Data Structures");
+    list.push_back("Operating Systems");
+    list.push_back("Computer Networks");
+    list.push_back("Database Systems");
+
+    list.push_front("Artificial Intelligence");
+    list.push_back("Machine Learning");
+    list.insert_after("Operating Systems", "Cyber Security");
+
+    cout << boolalpha << "Database Systems exists: " << list.search("Database Systems") << "\n";
+    cout << "Complete list:\n";
+    list.display();
+    return 0;
+}
