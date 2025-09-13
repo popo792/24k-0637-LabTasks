@@ -1,0 +1,89 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct Node2 {
+    string title;
+    Node2* next;
+    Node2(const string& s) : title(s), next(nullptr) {}
+};
+
+class Catalog {
+public:
+    Node2* head;
+    Node2* tail;
+
+    Catalog() : head(nullptr), tail(nullptr) {}
+
+    void add_tail(const string& s) {
+        Node2* n = new Node2(s);
+        if (!tail) {
+            head = tail = n;
+        } else {
+            tail->next = n;
+            tail = n;
+        }
+    }
+
+    bool delete_front() {
+        if (!head) return false;
+        Node2* t = head;
+        head = head->next;
+        if (!head) tail = nullptr;
+        delete t;
+        return true;
+    }
+
+    Node2* search_title(const string& s) {
+        Node2* t = head;
+        while (t) {
+            if (t->title == s) return t;
+            t = t->next;
+        }
+        return nullptr;
+    }
+
+    Node2* search_position(int pos) {
+        if (pos < 1) return nullptr;
+        Node2* t = head;
+        int i = 1;
+        while (t && i < pos) {
+            t = t->next;
+            ++i;
+        }
+        return t;
+    }
+
+    void display() {
+        Node2* t = head;
+        int i = 1;
+        while (t) {
+            cout << i++ << ": " << t->title << "\n";
+            t = t->next;
+        }
+        if (!head) cout << "Catalog empty\n";
+    }
+
+    ~Catalog() {
+        while (head) {
+            Node2* t = head;
+            head = head->next;
+            delete t;
+        }
+    }
+};
+
+int main() {
+    Catalog c;
+    c.add_tail("Book A");
+    c.add_tail("Book B");
+    c.add_tail("Book C");
+
+    c.display();
+    c.delete_front();
+    c.display();
+
+    if (c.search_title("Book B")) cout << "Found Book B\n";
+    if (c.search_position(2)) cout << "Found at position 2\n";
+    return 0;
+}
