@@ -1,0 +1,135 @@
+#include <iostream>
+using namespace std;
+
+struct Node4 {
+    int val;
+    Node4* next;
+    Node4(int v) : val(v), next(nullptr) {}
+};
+
+Node4* push_back(Node4* head, int v) {
+    Node4* n = new Node4(v);
+    if (!head) return n;
+    Node4* t = head;
+    while (t->next) t = t->next;
+    t->next = n;
+    return head;
+}
+
+void print_list(Node4* h) {
+    while (h) {
+        cout << h->val;
+        if (h->next) cout << " -> ";
+        h = h->next;
+    }
+    cout << "\n";
+}
+
+Node4* merge_sorted(Node4* a, Node4* b) {
+    if (!a) return b;
+    if (!b) return a;
+    if (a->val <= b->val) {
+        a->next = merge_sorted(a->next, b);
+        return a;
+    } else {
+        b->next = merge_sorted(a, b->next);
+        return b;
+    }
+}
+
+Node4* find_middle(Node4* head) {
+    if (!head) return nullptr;
+    Node4* slow = head;
+    Node4* fast = head;
+    while (fast && fast->next) {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    return slow;
+}
+
+Node4* remove_duplicates(Node4* head) {
+    Node4* cur = head;
+    while (cur && cur->next) {
+        Node4* runner = cur;
+        while (runner->next) {
+            if (runner->next->val == cur->val) {
+                Node4* dup = runner->next;
+                runner->next = runner->next->next;
+                delete dup;
+            } else {
+                runner = runner->next;
+            }
+        }
+        cur = cur->next;
+    }
+    return head;
+}
+
+Node4* merge_sort(Node4* head) {
+    if (!head || !head->next) return head;
+    Node4* slow = head;
+    Node4* fast = head->next;
+    while (fast && fast->next) {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    Node4* mid = slow->next;
+    slow->next = nullptr;
+    Node4* left = merge_sort(head);
+    Node4* right = merge_sort(mid);
+    return merge_sorted(left, right);
+}
+
+Node4* concatenate(Node4* a, Node4* b) {
+    if (!a) return b;
+    Node4* t = a;
+    while (t->next) t = t->next;
+    t->next = b;
+    return a;
+}
+
+int main() {
+    Node4* a = nullptr;
+    a = push_back(a, 3);
+    a = push_back(a, 1);
+    a = push_back(a, 4);
+    a = push_back(a, 2);
+    cout << "List A: "; print_list(a);
+
+    a = merge_sort(a);
+    cout << "Sorted A: "; print_list(a);
+
+    Node4* b = nullptr;
+    b = push_back(b, 5);
+    b = push_back(b, 2);
+    b = push_back(b, 6);
+    cout << "List B: "; print_list(b);
+
+    b = merge_sort(b);
+    cout << "Sorted B: "; print_list(b);
+
+    Node4* m = merge_sorted(a, b);
+    cout << "Merged sorted: "; print_list(m);
+
+    Node4* mid = find_middle(m);
+    cout << "Middle element: ";
+    if (mid) cout << mid->val << "\n";
+    else cout << "none\n";
+
+    m = push_back(m, 2);
+    m = push_back(m, 5);
+    cout << "With duplicates: "; print_list(m);
+
+    m = remove_duplicates(m);
+    cout << "After removing duplicates: "; print_list(m);
+
+    Node4* c = nullptr;
+    c = push_back(c, 7);
+    c = push_back(c, 8);
+    cout << "List C: "; print_list(c);
+
+    Node4* cat = concatenate(m, c);
+    cout << "Concatenated: "; print_list(cat);
+    return 0;
+}
