@@ -1,0 +1,101 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct Node {
+    string name;
+    int score;
+    Node* next;
+};
+
+void insert(Node*& head, string n, int s) {
+    Node* p = new Node;
+    p->name = n;
+    p->score = s;
+    p->next = nullptr;
+    if (!head) head = p;
+    else {
+        Node* t = head;
+        while (t->next) t = t->next;
+        t->next = p;
+    }
+}
+
+int getMax(Node* head) {
+    int m = 0;
+    while (head) {
+        if (head->score > m) m = head->score;
+        head = head->next;
+    }
+    return m;
+}
+
+int getDigit(int n, int exp) {
+    return (n / exp) % 10;
+}
+
+void radixSort(Node*& head) {
+    int maxVal = getMax(head);
+    for (int exp = 1; maxVal / exp > 0; exp *= 10) {
+        Node* buckets[10] = {nullptr};
+        Node* tails[10] = {nullptr};
+        Node* curr = head;
+        while (curr) {
+            int d = getDigit(curr->score, exp);
+            Node* nxt = curr->next;
+            curr->next = nullptr;
+            if (!buckets[d]) {
+                buckets[d] = tails[d] = curr;
+            } else {
+                tails[d]->next = curr;
+                tails[d] = curr;
+            }
+            curr = nxt;
+        }
+        head = nullptr;
+        Node* tail = nullptr;
+        for (int i = 0; i < 10; i++) {
+            if (buckets[i]) {
+                if (!head) {
+                    head = buckets[i];
+                    tail = tails[i];
+                } else {
+                    tail->next = buckets[i];
+                    tail = tails[i];
+                }
+            }
+        }
+    }
+}
+
+void display(Node* head) {
+    cout << endl <<"Sorted Student Records:" << endl;
+    cout << "-------------------------" << endl;
+    cout << "Name\tScore" << endl;
+    cout << "-------------------------" << endl;
+    while (head) {
+        cout << head->name << "\t" << head->score << endl;
+        head = head->next;
+    }
+    cout << "-------------------------" <<endl;
+}
+
+int main() {
+    int n;
+    cout << "Enter number of students: ";
+    cin >> n;
+    Node* head = nullptr;
+    for (int i = 1; i <= n; i++) {
+        string name;
+        int score;
+        cout << "Enter name of student " << i << ": ";
+        cin >> name;
+        cout << "Enter score (0–100): ";
+        cin >> score;
+        insert(head, name, score);
+    }
+    cout << endl<< "Sorting student scores using Radix Sort..." <<endl;
+    radixSort(head);
+    display(head);
+    return 0;
+}
