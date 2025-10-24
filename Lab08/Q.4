@@ -1,0 +1,88 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+};
+
+void insert(Node*& head, int val) {
+    Node* p = new Node{val, nullptr};
+    if (!head) head = p;
+    else {
+        Node* t = head;
+        while (t->next) t = t->next;
+        t->next = p;
+    }
+}
+
+void swapData(Node* a, Node* b) {
+    int temp = a->data;
+    a->data = b->data;
+    b->data = temp;
+}
+
+Node* partition(Node* head, Node* end, Node** newHead, Node** newEnd) {
+    Node* pivot = end;
+    Node *prev = nullptr, *curr = head, *tail = pivot;
+    while (curr != pivot) {
+        if (curr->data < pivot->data) {
+            if (!(*newHead)) *newHead = curr;
+            prev = curr;
+            curr = curr->next;
+        } else {
+            if (prev) prev->next = curr->next;
+            Node* tmp = curr->next;
+            curr->next = nullptr;
+            tail->next = curr;
+            tail = curr;
+            curr = tmp;
+        }
+    }
+    if (!(*newHead)) *newHead = pivot;
+    *newEnd = tail;
+    return pivot;
+}
+
+Node* quickSortRec(Node* head, Node* end) {
+    if (!head || head == end) return head;
+    Node *newHead = nullptr, *newEnd = nullptr;
+    Node* pivot = partition(head, end, &newHead, &newEnd);
+    if (newHead != pivot) {
+        Node* tmp = newHead;
+        while (tmp->next != pivot) tmp = tmp->next;
+        tmp->next = nullptr;
+        newHead = quickSortRec(newHead, tmp);
+        tmp = newHead;
+        while (tmp->next) tmp = tmp->next;
+        tmp->next = pivot;
+    }
+    pivot->next = quickSortRec(pivot->next, newEnd);
+    return newHead;
+}
+
+void quickSort(Node*& head) {
+    Node* end = head;
+    while (end && end->next) end = end->next;
+    head = quickSortRec(head, end);
+}
+
+void display(Node* head) {
+    while (head) {
+        cout << head->data << " ";
+        head = head->next;
+    }
+    cout << endl;
+}
+
+int main() {
+    int arr[] = {10, 7, 8, 9, 1, 5, 3};
+    Node* head = nullptr;
+    for (int i = 0; i < 7; i++) insert(head, arr[i]);
+    cout << "Unsorted List: ";
+    display(head);
+    quickSort(head);
+    cout << "Sorted List:   ";
+    display(head);
+    return 0;
+}
