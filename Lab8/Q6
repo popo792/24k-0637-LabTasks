@@ -1,0 +1,42 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct Node {
+    int id;
+    Node* left;
+    Node* right;
+    Node(int i) : id(i), left(NULL), right(NULL) {}
+};
+
+Node* insert(Node* root, int id) {
+    if (!root) return new Node(id);
+    if (id < root->id) root->left = insert(root->left, id);
+    else root->right = insert(root->right, id);
+    return root;
+}
+
+Node* lca(Node* root, int a, int b) {
+    if (!root) return NULL;
+    if (root->id > a && root->id > b) return lca(root->left, a, b);
+    if (root->id < a && root->id < b) return lca(root->right, a, b);
+    return root;
+}
+
+int main() {
+    Node* root = NULL;
+    int n;
+    cout << "Enter number of employees: ";
+    cin >> n;
+    for (int i = 0; i < n; i++) {
+        int id;
+        cout << "Enter employee ID: ";
+        cin >> id;
+        root = insert(root, id);
+    }
+    int a, b;
+    cout << "Enter two employee IDs: ";
+    cin >> a >> b;
+    Node* ans = lca(root, a, b);
+    if (ans) cout << "Lowest Common Manager: " << ans->id << endl;
+}
