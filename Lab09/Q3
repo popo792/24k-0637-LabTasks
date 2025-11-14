@@ -1,0 +1,130 @@
+//1
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node *left;
+    Node *right;
+    int height;
+};
+
+int getHeight(Node *node) {
+    if (node == NULL)
+        return 0;
+    return node->height;
+}
+
+int getBalance(Node *node) {
+    if (node == NULL)
+        return 0;
+    return getHeight(node->left) - getHeight(node->right);
+}
+
+Node *rightRotate(Node *y) {
+    Node *x = y->left;
+    Node *T2 = x->right;
+    x->right = y;
+    y->left = T2;
+    y->height = max(getHeight(y->left), getHeight(y->right)) + 1;
+    x->height = max(getHeight(x->left), getHeight(x->right)) + 1;
+    return x;
+}
+
+Node *leftRotate(Node *x) {
+    Node *y = x->right;
+    Node *T2 = y->left;
+    y->left = x;
+    x->right = T2;
+    x->height = max(getHeight(x->left), getHeight(x->right)) + 1;
+    y->height = max(getHeight(y->left), getHeight(y->right)) + 1;
+    return y;
+}
+
+Node *leftRightRotate(Node *node) {
+    node->left = leftRotate(node->left);
+    return rightRotate(node);
+}
+
+Node *rightLeftRotate(Node *node) {
+    node->right = rightRotate(node->right);
+    return leftRotate(node);
+}
+
+Node *insert(Node *node, int data) {
+    if (node == NULL)
+    {
+        Node *newNode = new Node();
+        newNode->data = data;
+        newNode->left = NULL;
+        newNode->right = NULL;
+        newNode->height = 1;
+        return newNode;
+    }
+    if (data < node->data)
+    {
+        node->left = insert(node->left, data);
+    }
+    else if (data > node->data)
+    {
+        node->right = insert(node->right, data);
+    }
+    else
+    {
+        return node;
+    }
+    node->height = 1 + max(getHeight(node->left), getHeight(node->right));
+    int balance = getBalance(node);
+    if (balance > 1 && data < node->left->data)
+    {
+        return rightRotate(node);
+    }
+    if (balance < -1 && data > node->right->data)
+    {
+        return leftRotate(node);
+    }
+    if (balance > 1 && data > node->left->data)
+    {
+        return leftRightRotate(node);
+    }
+    if (balance < -1 && data < node->right->data)
+    {
+        return rightLeftRotate(node);
+    }
+    return node;
+}
+
+void inOrder(Node *root) {
+    if (root != NULL)
+    {
+        inOrder(root->left);
+        cout << root->data << " ";
+        inOrder(root->right);
+    }
+}
+
+void printBalanceFactors(Node* root) {
+    if (!root) return;
+    cout << "Balance factor of " << root->data << ": " << getBalance(root) << endl;
+    printBalanceFactors(root->left);
+    printBalanceFactors(root->right);
+}
+
+int main() {
+    Node *root = NULL;
+    root = insert(root, 10);
+    root = insert(root, 5);
+    root = insert(root, 15);
+    root = insert(root, 3);
+    root = insert(root, 7);
+    cout << "In-order traversal: ";
+    inOrder(root);
+    cout << endl;
+    root = insert(root, 12);
+    cout << "In-order traversal (after adding 12): ";
+    inOrder(root);
+    cout << endl;
+    printBalanceFactors(root);
+    cout << "Height of the tree: " << getHeight(root) << endl;
+    return 0;
+}
